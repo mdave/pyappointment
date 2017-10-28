@@ -1,0 +1,8 @@
+{
+  "name": "pyapppointments",
+  "version": "1.0.0",
+  "author": "David Moxey <dave@xyloid.org>",
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}

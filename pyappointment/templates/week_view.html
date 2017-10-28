@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Book appointment{% endblock %}
+
+{% block jumbotron %}
+<div class="container" style="text-align: center">
+  <h1>David Moxey</h1>
+  <h4 style="margin-top:1em">Book an appointment slot below.</h4>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-2 visible-lg">
+    &nbsp;
+  </div>
+  <div class="col-md-2 visible-md">
+    &nbsp;
+  </div>
+  <div class="col-lg-8 col-md-8 col-sm-12">
+    <div class="row" style="margin-bottom: 10px;">
+      <div class="col-xs-6">
+        {% if prev_date %}
+        <a class="btn btn-info btn-lg" role="button" href="/view/{{ prev_date | date:'Y-m-d' }}">&laquo; Previous week</a>
+        {% endif %}
+      </div>
+      <div class="col-xs-6" style="text-align:right">
+        {% if next_date %}
+        <a class="btn btn-info btn-lg" role="button" href="/view/{{ next_date | date:'Y-m-d' }}">Next week &raquo;</a>
+        {% endif %}
+      </div>
+    </div>
+    <table class="table" style="text-align: center">
+      <thead style="font-weight:bold; font-size: 120%">
+        <tr>
+          {% for time in times.0 %}
+          <td>
+            {{ time.date | date:"D jS M"}}
+          </td>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for time in times %}
+        <tr>
+          {% for day in time %}
+          <td>
+            {% if not day.available %}
+            <button type="button" class="btn btn-default disabled" data-toggle="tooltip" data-placement="right" title="{{ day.reason }}" style="text-decoration: line-through">
+              {{ day.date | date:"H:i"}}
+            </button>
+            {% else %}
+            <a class="btn btn-success" role="button" href="/book/{{ day.date | date:'Y-m-d' }}/{{ day.date | date:'H-i' }}">{{ day.date | date:"H:i"}}</a>
+            {% endif %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+        <tr>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-lg-3 visible-lg">
+    &nbsp;
+  </div>
+  <div class="col-md-2 visible-md">
+    &nbsp;
+  </div>
+</div>
+{% endblock %}

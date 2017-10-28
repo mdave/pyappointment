@@ -1,0 +1,15 @@
+certifi==2017.7.27.1
+chardet==3.0.4
+Django==1.11.6
+django-appconf==1.0.2
+django-compressor==2.2
+django-static-precompiler==1.6
+idna==2.6
+PyCronofy==1.0.0
+python-dateutil==2.6.1
+pytz==2017.2
+rcssmin==1.0.6
+requests==2.18.4
+rjsmin==1.0.12
+six==1.11.0
+urllib3==1.22
