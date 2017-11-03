@@ -7,6 +7,7 @@ django-compressor==2.2
 django-static-precompiler==1.6
 icalendar==3.11.7
 idna==2.6
+-e git+https://github.com/mdave/json-config-parser.git@1c1ed2a2d6ac1356ce4455dd19262bd3dc86f7be#egg=json_config_parser
 PyCronofy==1.0.0
 python-dateutil==2.6.1
 pytz==2017.2
