@@ -3,15 +3,11 @@ import pytz
 import os
 import datetime as dt
 
-CAL_NAMES = [
-    "Dave", "Dave's Work", "Meetings"
-]
-
-CRONOFY_ACCESS_TOKEN = os.environ.get('CRONOFY_ACCESS_TOKEN')
+from pyappointment.settings import CRONOFY_ACCESS_TOKEN, CAL_NAMES, CAL_CREATE_BOOKING
 
 def utc_range(today, delta):
     # Get current day for timezone.
-    mon = today - dt.timedelta(today.weekday())
+    mon = today
     sun = mon + delta
     tz = today.tzinfo
 
@@ -26,19 +22,21 @@ def utc_range(today, delta):
 def connect_calendar():
     return pycronofy.Client(access_token=CRONOFY_ACCESS_TOKEN)
 
-def calendar_ids(cronofy):
+def filter_ids(cal_ids):
     # Figure out which calendar IDs we need to check.
     return [
-        c['calendar_id'] for c in cronofy.list_calendars() if
+        c['calendar_id'] for c in cal_ids if
         c['calendar_name'].lower() in map(str.lower, CAL_NAMES)
     ]
 
-def get_events(date, delta):
+def get_events(date, delta, handle=None, cal_ids=None):
     # Create Cronofy client object.
-    handle = connect_calendar()
-    cal_ids = calendar_ids(handle)
+    if handle is None:
+        handle = connect_calendar()
+    if cal_ids is None:
+        cal_ids = filter_ids(handle.list_calendars())
 
-    # Look up items in week's events
+    # Look up items in delta's events
     start, finish = utc_range(date, dt.timedelta(delta))
     return handle.read_events(
         calendar_ids=cal_ids, from_date=start, to_date=finish).all()

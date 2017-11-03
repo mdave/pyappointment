@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    <style type="text/css">
+      body {
+      margin:0;
+      padding:0;
+      background-color: #eee;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 160%;
+      }
+
+      #errormsg {
+      color: #555;
+      position: absolute;
+      width: 600px;
+      height: 300px;
+      z-index: 15;
+      top: 30%;
+      left: 50%;
+      margin: -150px 0 0 -300px;
+      text-align:center
+      }
+
+      #errormsg a {
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #4cae4c;
+      color:white;
+      text-decoration: none;
+      background-color: #5cb85c;
+      }
+      
+      #errormsg a:hover {
+      border-color: #398439;
+      background-color: #449d44;
+      }
+
+      #errormsg a:active {
+      box-shadow: inset 0 3px 5px rgba(0, 0, 0, .3);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="errormsg">
+      <h1>Booking confirmed</h1>
+
+      <ul style="text-align:left;margin-bottom:2em">
+        <li><strong>Date/Time:</strong> {{ date | date:'l jS F, H:i' }}</li>
+        <li><strong>Duration:</strong> {{ booking_info.duration }} minutes</li>
+        <li><strong>Location:</strong> {{ booking_info.location }}</li>
+      </ul>
+      
+      <a href="{{ redirect }}">{{ redirect_msg }}</a>
+    </div>
+  </body>
+</html>

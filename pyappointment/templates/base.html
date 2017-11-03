@@ -9,13 +9,7 @@
     <!-- Bootstrap -->
     {% load compress %}
     {% compress css %}
-    <link type="text/less" rel="stylesheet" href="/static/less/bootstrap.less" charset="utf-8">
-    <style type="text/less">
-        body {
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <link type="text/less" rel="stylesheet" href="/static/less/site.less" charset="utf-8">
     {% endcompress %}
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -33,7 +27,11 @@
       {% block content %}{% endblock %}
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="/static/dist/js/bootstrap.min.js"></script>
+
+    {% compress js %}
+    <script type="text/javascript" charset="utf-8" src="/static/bootstrap-js/tooltip.js"></script>
+    {% endcompress %}
+
     <script type="text/javascript">
       $(function () {
         $('[data-toggle="tooltip"]').tooltip()

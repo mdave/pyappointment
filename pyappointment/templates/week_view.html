@@ -4,8 +4,12 @@
 
 {% block jumbotron %}
 <div class="container" style="text-align: center">
-  <h1>David Moxey</h1>
+  <h1><a href="/">{{ organizer }}</a></h1>
   <h4 style="margin-top:1em">Book an appointment slot below.</h4>
+  <div style="text-align:center;margin-top:1em;font-size:110%">
+    <strong>Duration:</strong> {{ booking_info.duration }}
+    minutes, <strong>Location:</strong> {{ booking_info.location }}
+  </div>
 </div>
 {% endblock %}
 
@@ -21,27 +25,28 @@
     <div class="row" style="margin-bottom: 10px;">
       <div class="col-xs-6">
         {% if prev_date %}
-        <a class="btn btn-info btn-lg" role="button" href="/view/{{ prev_date | date:'Y-m-d' }}">&laquo; Previous week</a>
+        <a class="btn btn-info btn-lg" role="button" href="/{{ booking_type }}/{{ prev_date | date:'Y-m-d' }}">&laquo; Previous week</a>
         {% endif %}
       </div>
       <div class="col-xs-6" style="text-align:right">
         {% if next_date %}
-        <a class="btn btn-info btn-lg" role="button" href="/view/{{ next_date | date:'Y-m-d' }}">Next week &raquo;</a>
+        <a class="btn btn-info btn-lg" role="button" href="/{{ booking_type }}/{{ next_date | date:'Y-m-d' }}">Next week &raquo;</a>
         {% endif %}
       </div>
     </div>
     <table class="table" style="text-align: center">
-      <thead style="font-weight:bold; font-size: 120%">
+      <thead style="font-weight:bold; font-size: 120%{% if not times.one_available %}; border-bottom: 1px solid #ccc{% endif %}">
         <tr>
-          {% for time in times.0 %}
+          {% for time in times.times.0 %}
           <td>
             {{ time.date | date:"D jS M"}}
           </td>
           {% endfor %}
         </tr>
       </thead>
+      {% if times.one_available %}
       <tbody>
-        {% for time in times %}
+        {% for time in times.times %}
         <tr>
           {% for day in time %}
           <td>
@@ -50,7 +55,7 @@
               {{ day.date | date:"H:i"}}
             </button>
             {% else %}
-            <a class="btn btn-success" role="button" href="/book/{{ day.date | date:'Y-m-d' }}/{{ day.date | date:'H-i' }}">{{ day.date | date:"H:i"}}</a>
+            <a class="btn btn-success" role="button" href="/book/{{ booking_type }}/{{ day.date | date:'Y-m-d' }}/{{ day.date | date:'H-i' }}">{{ day.date | date:"H:i"}}</a>
             {% endif %}
           </td>
           {% endfor %}
@@ -59,7 +64,13 @@
         <tr>
         </tr>
       </tbody>
+      {% endif %}
     </table>
+    {% if not times.one_available %}
+    <div style="text-align: center">
+      <h2>Nothing available this week.</h2>
+    </div>
+    {% endif %}
   </div>
   <div class="col-lg-3 visible-lg">
     &nbsp;

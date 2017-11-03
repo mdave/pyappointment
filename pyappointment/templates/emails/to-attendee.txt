@@ -1,0 +1,13 @@
+Hi {{ recipient }},
+
+Just a quick reminder to let you know that your booking is confirmed.
+
+Date: {{ date | date:'l jS F, H:i' }}
+Duration: {{ booking_info.duration }} minutes
+Location: {{ booking_info.location }}
+
+Look forward to seeing you then!
+
+Regards,
+
+{{ organizer }}

@@ -1,0 +1,62 @@
+[django]
+SECRET_KEY = "enter_your_secret_key"
+ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+DEBUG = false
+ADMINS = ["admin1@mydomain.com", "admin2@mydomain.com" ]
+
+[meetings]
+ORGANIZER_NAME = 'Your Name'
+ORGANIZER_EMAIL = 'admin1@mydomain.com'
+ORGANIZER_GREETING = "Shortened version of your name for greetings"
+BOOKING_TYPES = {
+    "project": {
+        "description": "Undergraduate Project"
+        "duration": 30,
+        "slots": 30,
+        "location": "My office",
+        "future_limit": 21,
+        "hidden": true
+    },
+    "tutorial": {
+        "description": "Tutorial"
+        "duration": 30,
+        "slots": 30,
+        "location": "My office",
+        "future_limit": 21,
+        "hidden": false
+    },
+    "phd": {
+        "description": "PhD meeting"
+        "duration": 60,
+        "slots": 30,
+        "location": "My office",
+        "future_limit": 0,
+        "hidden": false
+    }   
+}
+
+[email]
+SEND_EMAIL = true
+USE_SSL = true
+ADDRESS = "appointments@mydomain.com"
+HOST = "mail.mydomain.com"
+PORT = 465
+HOST_USER = "appointments@mydomain.com"
+HOST_PASSWORD = "mail_password"
+
+[cronofy]
+ACCESS_TOKEN = "cronofy_access_token"
+
+[calendar]
+TIMEZONE = "Europe/London"
+CHECK = [ "Calendars", "to", "check", "schedule", "for" ]
+BOOK = "Calendar to book events in"
+
+[availability]
+MON = "09:30-12:30, 13:30-16:30"
+TUE = "09:30-12:30, 13:30-16:30"
+WED = "09:30-12:30, 13:30-16:30"
+THU = "09:30-12:30, 13:30-16:30"
+FRI = "09:30-12:30, 13:30-16:30"
+SAT = "None"
+SUN = "None"

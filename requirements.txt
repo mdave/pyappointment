@@ -2,8 +2,10 @@ certifi==2017.7.27.1
 chardet==3.0.4
 Django==1.11.6
 django-appconf==1.0.2
+django-bootstrap-form==3.3
 django-compressor==2.2
 django-static-precompiler==1.6
+icalendar==3.11.7
 idna==2.6
 PyCronofy==1.0.0
 python-dateutil==2.6.1

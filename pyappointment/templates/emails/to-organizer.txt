@@ -1,0 +1,8 @@
+Hi {{ organizer }},
+
+You've received the following booking from {{ recipient }}.
+
+Booking type: {{ booking_info.description }}
+Date: {{ date | date:'l jS F, H:i' }}
+Duration: {{ booking_info.duration }} minutes
+Location: {{ booking_info.location }}

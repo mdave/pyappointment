@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Book appointment{% endblock %}
+
+{% block jumbotron %}
+<div class="container" style="text-align: center">
+  <h1><a href="/">{{ organizer }}</a></h1>
+  <h4 style="margin-top:1em">Select an appointment type below.</h4>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  {% for key, val in booking_types.items %}
+  <div class="col-md-4">
+    <a class="booking-type" href="/{{ key }}/">
+      <strong>{{ val.description }}</strong> <br />
+      {{ val.duration }} minutes
+    </a>
+  </div>
+  {% if forloop.counter|divisibleby:3 %}
+    </div>
+    <div class="row">
+  {% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

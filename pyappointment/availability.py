@@ -1,6 +1,9 @@
 import datetime as dt
 import pytz
 
+from django.core.exceptions import ImproperlyConfigured
+import pyappointment.settings as settings
+
 class Availability():
     """
     A class detailing availability times.
@@ -30,28 +33,23 @@ class Availability():
         return min(self.time_ranges, key=lambda t: t[0])[0].time(), \
                max(self.time_ranges, key=lambda t: t[1])[1].time()
 
-MEETING_AVAIL = [
-    Availability([
-        (dt.time(9, 30), dt.time(12, 30)),
-        (dt.time(13, 30), dt.time(16, 30))
-    ]),
-    Availability([
-        (dt.time(9, 30), dt.time(12, 30)),
-        (dt.time(13, 30), dt.time(16, 30))
-    ]),
-    Availability([
-        (dt.time(9, 30), dt.time(12, 30)),
-        (dt.time(13, 30), dt.time(16, 30))
-    ]),
-    Availability([
-        (dt.time(9, 30), dt.time(12, 30)),
-        (dt.time(13, 30), dt.time(16, 30))
-    ]),
-    Availability([
-        (dt.time(9, 30), dt.time(12, 30)),
-        (dt.time(13, 30), dt.time(16, 30))
-    ]),
-    Availability([]),
-    Availability([])
-]
+    @classmethod
+    def from_config(cls, config_str):
+        config_str = config_str.strip()
+        if config_str == '' or config_str.lower() == 'none':
+            return cls([])
 
+        try:
+            return cls([
+                tuple(
+                    dt.datetime.strptime(timestr.strip(), '%H:%M').time()
+                    for timestr in a.split('-')
+                )
+                for a in config_str.split(',')
+            ])
+        except ValueError:
+            raise ImproperlyConfigured("Unable to parse availability strings.")
+
+MEETING_AVAIL = [
+    Availability.from_config(s) for s in settings.AVAIL_CONFIG_STRINGS
+]
