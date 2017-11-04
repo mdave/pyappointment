@@ -18,10 +18,14 @@
       {{ val.duration }} minutes
     </a>
   </div>
-  {% if forloop.counter|divisibleby:3 %}
+    {% if forloop.counter|divisibleby:3 %}
     </div>
     <div class="row">
-  {% endif %}
+    {% endif %}
+  {% empty %}
+    <div class="col-md-12" style="text-align: center">
+      <h2>Bookings currently unavailable.</h2>
+    </div>
   {% endfor %}
 </div>
 {% endblock %}

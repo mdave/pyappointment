@@ -220,7 +220,10 @@ def view_booking_type(request, booking_type):
 
 def index(request):
     now = dt.datetime.now(LOCALTZ)
+
     return render(request, 'index.html', {
         'organizer': settings.ORGANIZER_NAME,
-        'booking_types': settings.BOOKING_TYPES
+        'booking_types': {
+            k: v for k, v in settings.BOOKING_TYPES.items() if not v['hidden']
+        }
     })
