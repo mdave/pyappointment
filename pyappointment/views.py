@@ -18,7 +18,11 @@ def convert_iso8601(iso_str, tz):
     """
     Converts a date in ISO 8601 format to a datetime object, given a timezone tz.
     """
-    return dateutil.parser.parse(iso_str).astimezone(tz)
+    tmp = dateutil.parser.parse(iso_str)
+    if tmp.tzinfo is None:
+        # All-day event, so assume we're in the local timezone
+        tmp = LOCALTZ.localize(tmp)
+    return tmp.astimezone(tz)
 
 def replace_time(date, time):
     return date.replace(hour=time.hour, minute=time.minute, second=0, microsecond=0)
@@ -175,7 +179,7 @@ def booking_form(request, booking_type, year, month, day, hour, minute):
                     'tzid': str(LOCALTZ)
                 }
 
-                #handle.upsert_event(calendar_id=book_cal_id, event=event)
+                handle.upsert_event(calendar_id=book_cal_id, event=event)
             except:
                 return render(request, 'error.html', {
                     'error_title': 'Booking error',
@@ -185,9 +189,9 @@ def booking_form(request, booking_type, year, month, day, hour, minute):
                 })
 
             # Send reminder email.
-            #send_appointment_email(start, finish, form.cleaned_data['name'], booking_info,
-            #                       form.cleaned_data['notes'], event['event_id'],
-            #                       form.cleaned_data['email'])
+            send_attendee_email(start, finish, form.cleaned_data['name'], booking_type,
+                                form.cleaned_data['notes'], event['event_id'],
+                                form.cleaned_data['email'])
             send_organizer_email(start, finish, form.cleaned_data['name'], booking_type,
                                  form.cleaned_data['notes'], event['event_id'])
 
@@ -200,7 +204,7 @@ def booking_form(request, booking_type, year, month, day, hour, minute):
             })
 
     else:
-        form = BookingForm()    
+        form = BookingForm()
 
     return render(request, 'book.html', {
         'form': form,
