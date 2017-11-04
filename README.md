@@ -10,7 +10,7 @@ YouCanBook.Me, but for a single user only and without many of the bells and
 whistles these services supply (or much support!)
 
 PyAppointment relies on you having a (free) developer account with the calendar
-service [https://www.cronofy.com](Cronofy). This means that it can use any of
+service [Cronofy](https://www.cronofy.com). This means that it can use any of
 the calendar services it supports, including Google Calendar, iCloud Calendar
 and Outlook Exchange calendars.
 

@@ -11,11 +11,11 @@ ORGANIZER_GREETING = "Shortened version of your name for greetings"
 BOOKING_TYPES = {
     "project": {
         "description": "Undergraduate Project"
-        "duration": 30,
-        "slots": 30,
-        "location": "My office",
-        "future_limit": 21,
-        "hidden": true
+        "duration": 30,          # Duration of the meeting slots, in minutes
+        "slots": 30,             # Interval between slots on booking page, in minutes
+        "location": "My office", # Location of the meeting
+        "future_limit": 21,      # Allow bookings only up to 21 days ahead.
+        "hidden": true           # If hidden, will not appear on the index page.
     },
     "tutorial": {
         "description": "Tutorial"
@@ -36,7 +36,6 @@ BOOKING_TYPES = {
 }
 
 [email]
-SEND_EMAIL = true
 USE_SSL = true
 ADDRESS = "appointments@mydomain.com"
 HOST = "mail.mydomain.com"
@@ -45,14 +44,21 @@ HOST_USER = "appointments@mydomain.com"
 HOST_PASSWORD = "mail_password"
 
 [cronofy]
+# This is your access token from Cronofy
 ACCESS_TOKEN = "cronofy_access_token"
 
 [calendar]
+# Timezone in which to create bookings and display booking times.
 TIMEZONE = "Europe/London"
+# Calendars against which we should check for schedule conflicts.
 CHECK = [ "Calendars", "to", "check", "schedule", "for" ]
+# Calendar in which to create bookings.
 BOOK = "Calendar to book events in"
 
 [availability]
+# Define your regions of availability as a simple comma-separated string of time
+# ranges, similar to those shown below. "none" or "" means that day is entirely
+# unavailable.
 MON = "09:30-12:30, 13:30-16:30"
 TUE = "09:30-12:30, 13:30-16:30"
 WED = "09:30-12:30, 13:30-16:30"
