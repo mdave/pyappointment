@@ -14,14 +14,16 @@ BOOKING_TYPES = {
         "duration": 30,          # Duration of the meeting slots, in minutes
         "slots": 30,             # Interval between slots on booking page, in minutes
         "location": "My office", # Location of the meeting
+        "lead_time": 2,          # Allow bookings 2 hours from current time.
         "future_limit": 21,      # Allow bookings only up to 21 days ahead.
-        "hidden": true           # If hidden, will not appear on the index page.
+        "hidden": true           # If hidden, this event will not appear on the index page.
     },
     "tutorial": {
         "description": "Tutorial"
         "duration": 30,
         "slots": 30,
         "location": "My office",
+        "lead_time": 2,
         "future_limit": 21,
         "hidden": false
     },
@@ -30,6 +32,7 @@ BOOKING_TYPES = {
         "duration": 60,
         "slots": 30,
         "location": "My office",
+        "lead_time": 2,
         "future_limit": 0,
         "hidden": false
     }   
@@ -54,6 +57,10 @@ TIMEZONE = "Europe/London"
 CHECK = [ "Calendars", "to", "check", "schedule", "for" ]
 # Calendar in which to create bookings.
 BOOK = "Calendar to book events in"
+# Show tooltips which explain why slots are unavailable
+SHOW_REASONS = false
+# Name events in the calendar that conflict with unavailable slots.
+SHOW_CONFLCTING_EVENTS = false
 
 [availability]
 # Define your regions of availability as a simple comma-separated string of time

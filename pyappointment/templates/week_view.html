@@ -23,12 +23,15 @@
   </div>
   <div class="col-lg-8 col-md-8 col-sm-12">
     <div class="row" style="margin-bottom: 10px;">
-      <div class="col-xs-6">
+      <div class="col-xs-6 col-sm-3">
         {% if prev_date %}
         <a class="btn btn-info btn-lg" role="button" href="/{{ booking_type }}/{{ prev_date | date:'Y-m-d' }}">&laquo; Previous week</a>
         {% endif %}
       </div>
-      <div class="col-xs-6" style="text-align:right">
+      <div class="col-sm-6 hidden-xs" style="text-align: center; color: #666; font-size: 120%; font-weight: bold; padding-top: 0.5em">
+        Week commencing {{ times.monday | date:"D jS M" }}
+      </div>
+      <div class="col-xs-6 col-sm-3" style="text-align:right">
         {% if next_date %}
         <a class="btn btn-info btn-lg" role="button" href="/{{ booking_type }}/{{ next_date | date:'Y-m-d' }}">Next week &raquo;</a>
         {% endif %}
@@ -48,10 +51,17 @@
       <tbody>
         {% for time in times.times %}
         <tr>
+          {% if time == 'gap' %}
+          {% for time in times.times.0 %}
+          <td>
+            <span class="glyphicon glyphicon-arrow-down" style="color:#777" aria-hidden="true"></span>
+          </td>
+          {% endfor %}
+          {% else %}
           {% for day in time %}
           <td>
             {% if not day.available %}
-            <button type="button" class="btn btn-default disabled" data-toggle="tooltip" data-placement="right" title="{{ day.reason }}" style="text-decoration: line-through">
+            <button type="button" class="btn btn-default disabled"{% if show_reasons %} data-toggle="tooltip" data-placement="right" title="{{ day.reason }}"{% endif %} style="text-decoration: line-through">
               {{ day.date | date:"H:i"}}
             </button>
             {% else %}
@@ -60,6 +70,7 @@
           </td>
           {% endfor %}
         </tr>
+        {% endif %}
         {% endfor %}
         <tr>
         </tr>

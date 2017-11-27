@@ -151,6 +151,8 @@ CRONOFY_ACCESS_TOKEN = config.get('cronofy', 'ACCESS_TOKEN')
 CAL_NAMES = config.get("calendar", "CHECK")
 CAL_CREATE_BOOKING = config.get("calendar", "BOOK")
 TIME_ZONE = config.get("calendar", "TIME_ZONE")
+SHOW_REASONS = config.get("calendar", "SHOW_REASONS")
+SHOW_CONFLICTING_EVENTS = config.get("calendar", "SHOW_CONFLICTING_EVENTS")
 
 # Parse availability strings
 AVAIL_CONFIG_STRINGS = [

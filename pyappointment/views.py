@@ -25,6 +25,10 @@ def convert_iso8601(iso_str, tz):
     return tmp.astimezone(tz)
 
 def replace_time(date, time):
+    """
+    Replaces the time component of a date with values from a given dateutil.time
+    object.
+    """
     return date.replace(hour=time.hour, minute=time.minute, second=0, microsecond=0)
 
 def get_monday(date):
@@ -36,14 +40,19 @@ def perdelta(start, end, delta):
         yield curr
         curr += delta
 
-def check_available(booking_type, start, finish, events):
+def check_available(booking_info, start, finish, events):
     # First, check we're within 2 hours of right now.
     now = dt.datetime.now(LOCALTZ)
-    if start < now + dt.timedelta(hours=2):
+    if start < now:
         return False, "date in the past"
 
+    lead_time = booking_info['lead_time']
+    if start < now + dt.timedelta(hours=lead_time):
+        return False, "not enough lead time: bookings must be at least {:d} {:s} in advance".format(
+            lead_time, 'hour' if lead_time == 1 else 'hours')
+
     # Don't let anyone book later than an upper limit
-    upper_limit = settings.BOOKING_TYPES[booking_type]['future_limit']
+    upper_limit = booking_info['future_limit']
     if upper_limit != 0 and start > now + dt.timedelta(days=upper_limit):
         return False, "date too far in the future"
 
@@ -57,23 +66,29 @@ def check_available(booking_type, start, finish, events):
         e_end   = convert_iso8601(e['end'], LOCALTZ)
 
         if start < e_end and finish > e_start:
-            return False, "conflicts with event: " + e['summary']
+            if settings.SHOW_CONFLICTING_EVENTS:
+                return False, "conflicts with event: " + e['summary']
+            else:
+                return False, "conflicts with existing event"
 
     return True, "available"
 
-def generate_week_times(booking_type, date):
+def generate_week_times(booking_info, date):
     # Calculate minimum and maximum times for the week's availability.
     min_time, max_time = dt.time.max, dt.time.min
 
-    for avail in MEETING_AVAIL:
+    # Holds the index of days we'll be displaying.
+    display_days = []
+
+    for i, avail in enumerate(MEETING_AVAIL):
         t_min, t_max = avail.day_range()
         if t_min is None:
             continue
 
         min_time, max_time = min(min_time, t_min), max(max_time, t_max)
+        display_days.append(i)
 
     # Populate a list of times that we've available.
-    booking_info = settings.BOOKING_TYPES[booking_type]
     times        = []
     monday       = replace_time(get_monday(date), min_time)
     duration     = dt.timedelta(minutes=booking_info['duration'])
@@ -82,17 +97,27 @@ def generate_week_times(booking_type, date):
     # Grab raw event data from calendar.
     events = calendar_link.get_events(monday, 7)
 
+    # Track availability:
+    #
+    #   - one_availability is True if at least one slot in the week is free;
+    #   - prev_gap is True if the previous timeslot was a gap (i.e. no time was
+    #     available across all of the days);
+    #
+    # These are used to condense the week view to only a sensible range of
+    # times.
     one_available = False
+    prev_gap      = False
 
     for d in perdelta(monday, replace_time(monday, max_time), delta):
         tmp = []
-        for i in range(0,7):
+        no_avail = True
+        for i in display_days:
             date = d + dt.timedelta(days=i)
 
             # First, check availability against specified limits.
-            available, reason = check_available(booking_type, date, date + duration, events)
-
+            available, reason = check_available(booking_info, date, date + duration, events)
             if available:
+                no_avail = False
                 one_available = True
 
             tmp.append({
@@ -100,9 +125,26 @@ def generate_week_times(booking_type, date):
                 'available': available,
                 'reason': reason
             })
-        times.append(tmp)
 
-    return { 'times': times, 'one_available': one_available }
+        if not no_avail:
+            times.append(tmp)
+            prev_gap = False
+        else:
+            if not prev_gap:
+                times.append('gap')
+                prev_gap = True
+
+    # Trim from start of array
+    if len(times) > 0:
+        if times[0] == 'gap':
+            times.pop(0)
+
+    # Trim from end of array
+    if len(times) > 0:
+        if times[-1] == 'gap':
+            times.pop()
+
+    return { 'times': times, 'one_available': one_available, 'monday': monday }
 
 def view_week(request, booking_type, year, month, day):
     try:
@@ -118,17 +160,19 @@ def view_week(request, booking_type, year, month, day):
     if prev_date < now - dt.timedelta(days=7):
         prev_date = None
 
-    future_limit = settings.BOOKING_TYPES[booking_type]['future_limit']
+    booking_info = settings.BOOKING_TYPES[booking_type]
+    future_limit = booking_info['future_limit']
     if future_limit != 0 and next_date > now + dt.timedelta(days=future_limit):
         next_date = None
 
     return render(request, 'week_view.html', {
-        'times': generate_week_times(booking_type, date),
+        'times': generate_week_times(booking_info, date),
         'booking_type': booking_type,
-        'booking_info': settings.BOOKING_TYPES[booking_type],
+        'booking_info': booking_info,
         'organizer': settings.ORGANIZER_NAME,
         'prev_date': prev_date,
-        'next_date': next_date
+        'next_date': next_date,
+        'show_reasons': settings.SHOW_REASONS
     })
 
 def booking_form(request, booking_type, year, month, day, hour, minute):
@@ -156,7 +200,7 @@ def booking_form(request, booking_type, year, month, day, hour, minute):
     start        = date
     finish       = date + dt.timedelta(minutes=duration)
 
-    if not check_available(booking_type, start, finish, events)[0]:
+    if not check_available(booking_info, start, finish, events)[0]:
         return render(request, 'error.html', {
             'error_title': 'Booking error',
             'error_message': 'This slot is not available for bookings.',
