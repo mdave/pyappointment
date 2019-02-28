@@ -79,7 +79,8 @@ def check_available(booking_info, start, finish, events):
                     continue
 
                 # Parse this date and check it matches our key.
-                if dt.date.fromisoformat(key) != start.date():
+                d_y, d_m, d_d = [ int(a) for a in key.split('-') ]
+                if dt.date(d_y, d_m, d_d) != start.date():
                     continue
 
                 # Construct availability
