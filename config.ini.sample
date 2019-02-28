@@ -17,6 +17,9 @@ BOOKING_TYPES = {
         "lead_time": 2,          # Allow bookings 2 hours from current time.
         "future_limit": 21,      # Allow bookings only up to 21 days ahead.
         "hidden": true           # If hidden, this event will not appear on the index page.
+        "availability": {        # Override availability for a particular event type.
+            'MON': '12:00-1:00, 3:00-4:00'
+        }
     },
     "tutorial": {
         "description": "Tutorial"
@@ -26,6 +29,9 @@ BOOKING_TYPES = {
         "lead_time": 2,
         "future_limit": 21,
         "hidden": false
+        "availability": {        # Availability for a particular event type can also be restricted to one date.
+            '2019-12-12': '12:00-1:00, 3:00-4:00'
+        }
     },
     "phd": {
         "description": "PhD meeting"

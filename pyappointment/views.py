@@ -9,7 +9,7 @@ import pytz
 
 from pyappointment import settings, calendar_link
 from pyappointment.email import send_attendee_email, send_organizer_email
-from pyappointment.availability import MEETING_AVAIL
+from pyappointment.availability import MEETING_AVAIL, Availability
 from pyappointment.forms import BookingForm
 
 LOCALTZ = pytz.timezone(settings.TIME_ZONE)
@@ -32,6 +32,9 @@ def replace_time(date, time):
     return date.replace(hour=time.hour, minute=time.minute, second=0, microsecond=0)
 
 def get_monday(date):
+    """
+    Returns start of the week (defined as Monday) given a particular date.
+    """
     return date - dt.timedelta(date.weekday())
 
 def perdelta(start, end, delta):
@@ -41,23 +44,60 @@ def perdelta(start, end, delta):
         curr += delta
 
 def check_available(booking_info, start, finish, events):
-    # First, check we're within 2 hours of right now.
+    # First, check this time isn't in the past.
     now = dt.datetime.now(LOCALTZ)
     if start < now:
         return False, "date in the past"
 
+    # Now check if we have sufficient lead time for this booking type.
     lead_time = booking_info['lead_time']
     if start < now + dt.timedelta(hours=lead_time):
         return False, "not enough lead time: bookings must be at least {:d} {:s} in advance".format(
             lead_time, 'hour' if lead_time == 1 else 'hours')
 
-    # Don't let anyone book later than an upper limit
+    # Don't let anyone book later than an upper limit.
     upper_limit = booking_info['future_limit']
     if upper_limit != 0 and start > now + dt.timedelta(days=upper_limit):
         return False, "date too far in the future"
 
-    # Now check hard-coded availability times
-    if not MEETING_AVAIL[start.weekday()].is_available(start.time(), finish.time()):
+    # If this booking type defines a custom availability, check against this.
+    if 'availability' in booking_info:
+        # Determine if we've defined a specific date for this booking
+        # type. Specific dates are defined in the form 'YYYY-MM-DD'. In this
+        # case, we ignore _any_ other general dates given in the availability
+        # list.
+        specific_dates = False
+        for key in booking_info['availability'].keys():
+            if '-' in key:
+                specific_dates = True
+                break
+
+        avail = False
+        if specific_dates:
+            for key, val in booking_info['availability'].items():
+                if '-' not in key:
+                    continue
+
+                # Parse this date and check it matches our key.
+                if dt.date.fromisoformat(key) != start.date():
+                    continue
+
+                # Construct availability
+                avail = Availability.from_config(val).is_available(start.time(), finish.time())
+                if avail:
+                    break
+        else:
+            # Check if
+            dow = start.strftime('%a').upper()
+            avail_val = booking_info['availability'].get(dow)
+            if avail_val is not None:
+                avail = Availability.from_config(avail_val).is_available(start.time(), finish.time())
+
+        if not avail:
+            return False, "non-available time"
+
+    elif not MEETING_AVAIL[start.weekday()].is_available(start.time(), finish.time()):
+        # Check hard-coded availability times.
         return False, "non-available time"
 
     # Finally, check against events.
