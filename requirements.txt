@@ -1,6 +1,6 @@
 certifi==2017.7.27.1
 chardet==3.0.4
-Django==1.11.20
+Django==1.11.23
 django-appconf==1.0.2
 django-bootstrap-form==3.3
 django-compressor==2.2
@@ -15,4 +15,4 @@ rcssmin==1.0.6
 requests==2.21.0
 rjsmin==1.0.12
 six==1.11.0
-urllib3==1.24.1
+urllib3==1.24.2
