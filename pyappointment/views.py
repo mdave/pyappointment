@@ -155,7 +155,7 @@ def generate_week_times(booking_info, date):
     for d in perdelta(monday, replace_time(monday, max_time), delta):
         tmp = []
         no_avail = True
-        for n, i in display_days:
+        for n, i in enumerate(display_days):
             date = d + dt.timedelta(days=i)
 
             # First, check availability against specified limits.
@@ -179,8 +179,13 @@ def generate_week_times(booking_info, date):
                 times.append('gap')
                 prev_gap = True
 
-    # Remove any days where we're not fully available.
-    times = [ t for i, t in enumerate(times) if avail_days[i] ]
+    # Remove any days where we're not fully available, if this is configured for
+    # this booking type.
+    if 'collapse_days' in booking_info and booking_info['collapse_days']:
+        times = [
+            [ d for i, d in enumerate(t) if avail_days[i] ]
+            if type(t) == list else t for t in times
+        ]
 
     # Trim from start of array
     if len(times) > 0:

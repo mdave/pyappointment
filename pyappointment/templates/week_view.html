@@ -61,11 +61,11 @@
           {% for day in time %}
           <td>
             {% if not day.available %}
-            <button type="button" class="btn btn-default disabled"{% if show_reasons %} data-toggle="tooltip" data-placement="right" title="{{ day.reason }}"{% endif %} style="text-decoration: line-through">
+            <button type="button" class="btn btn-default btn-time disabled"{% if show_reasons %} data-toggle="tooltip" data-placement="right" title="{{ day.reason }}"{% endif %} style="text-decoration: line-through">
               {{ day.date | date:"H:i"}}
             </button>
             {% else %}
-            <a class="btn btn-success" role="button" href="/book/{{ booking_type }}/{{ day.date | date:'Y-m-d' }}/{{ day.date | date:'H-i' }}">{{ day.date | date:"H:i"}}</a>
+            <a class="btn btn-success btn-time" role="button" href="/book/{{ booking_type }}/{{ day.date | date:'Y-m-d' }}/{{ day.date | date:'H-i' }}">{{ day.date | date:"H:i"}}</a>
             {% endif %}
           </td>
           {% endfor %}
