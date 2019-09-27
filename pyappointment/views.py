@@ -88,7 +88,7 @@ def check_available(booking_info, start, finish, events):
                 if avail:
                     break
         else:
-            # Check if
+            # Check against normal availability.
             dow = start.strftime('%a').upper()
             avail_val = booking_info['availability'].get(dow)
             if avail_val is not None:
@@ -121,19 +121,40 @@ def generate_week_times(booking_info, date):
     # Holds the index of days we'll be displaying.
     display_days = []
 
+    # Get monday before date.
+    monday = get_monday(date)
+
     for i, avail in enumerate(MEETING_AVAIL):
         t_min, t_max = avail.day_range()
         if t_min is None:
             continue
 
+        # Check for specific availability regions to override minimum and
+        # maximum.
+        if 'availability' in booking_info:
+            date_i = monday + dt.timedelta(days=i)
+            for key, val in booking_info['availability'].items():
+                if '-' not in key:
+                    continue
+
+                d_y, d_m, d_d = [ int(a) for a in key.split('-') ]
+                if dt.date(d_y, d_m, d_d) != date_i.date():
+                    continue
+
+                t_min, t_max = Availability.from_config(val).day_range()
+                break
+
+            if t_min is None:
+                continue
+
         min_time, max_time = min(min_time, t_min), max(max_time, t_max)
         display_days.append(i)
 
     # Populate a list of times that we've available.
-    times        = []
-    monday       = replace_time(get_monday(date), min_time)
-    duration     = dt.timedelta(minutes=booking_info['duration'])
-    delta        = dt.timedelta(minutes=booking_info['slots'])
+    times    = []
+    monday   = replace_time(get_monday(date), min_time)
+    duration = dt.timedelta(minutes=booking_info['duration'])
+    delta    = dt.timedelta(minutes=booking_info['slots'])
 
     # Grab raw event data from calendar.
     events = calendar_link.get_events(monday, 7)
