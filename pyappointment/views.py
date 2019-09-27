@@ -143,23 +143,27 @@ def generate_week_times(booking_info, date):
     #   - one_availability is True if at least one slot in the week is free;
     #   - prev_gap is True if the previous timeslot was a gap (i.e. no time was
     #     available across all of the days);
+    #   - avail_days[i] is True if at least one appointment slot is available
+    #     for display_days[i].
     #
     # These are used to condense the week view to only a sensible range of
     # times.
     one_available = False
     prev_gap      = False
+    avail_days    = [ False ] * len(display_days)
 
     for d in perdelta(monday, replace_time(monday, max_time), delta):
         tmp = []
         no_avail = True
-        for i in display_days:
+        for n, i in display_days:
             date = d + dt.timedelta(days=i)
 
             # First, check availability against specified limits.
             available, reason = check_available(booking_info, date, date + duration, events)
             if available:
-                no_avail = False
+                no_avail      = False
                 one_available = True
+                avail_days[n] = True
 
             tmp.append({
                 'date': date,
@@ -174,6 +178,9 @@ def generate_week_times(booking_info, date):
             if not prev_gap:
                 times.append('gap')
                 prev_gap = True
+
+    # Remove any days where we're not fully available.
+    times = [ t for i, t in enumerate(times) if avail_days[i] ]
 
     # Trim from start of array
     if len(times) > 0:
